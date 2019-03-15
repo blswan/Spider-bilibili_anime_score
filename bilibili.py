@@ -21,7 +21,11 @@ threads = 5
 sleep_time = 1
 
 def get_index(index_response, db):
-	'''Crawling bilibili_index_page and save to Mysql'''
+	"""
+	:index_response 索引页源码
+	:db 已连接的数据库
+	:video_urls: 为当前页面所有动漫网址
+	"""
 	video_urls = {}
 	index_html = index_response
 	index_doc = pq(index_html)
@@ -40,7 +44,11 @@ def get_index(index_response, db):
 	return video_urls
 
 def get_detail(detail_response, anime_name, db, sleep_time):
-	'''Crawling bilibili_detail_page and save to Mysql'''
+	"""
+	:detail_response 动漫播放页面的源码
+	:anime_name 动漫名称
+	:db 已打开的数据库
+	"""
 	time.sleep(sleep_time)
 	detail_html = detail_response
 	detail_doc = pq(detail_html)
@@ -53,7 +61,6 @@ def get_detail(detail_response, anime_name, db, sleep_time):
 	update_to_mysql(detail_data, db)
 
 def update_to_mysql(data, db):
-	'''insert or update data to mysql'''
 	data_keys = ', '.join(data.keys())
 	data_values = ', '.join(['%s'] * len(data))
 	cursor = db.cursor()
