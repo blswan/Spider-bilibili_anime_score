@@ -96,7 +96,7 @@ def run(index_url, sem, page, sleep_time):
 	print('==========================\n')
 	time.sleep(sleep_time)
 	db.close()
-	browser.close()
+	browser.quit()
 	sem.release()
 
 def thread(sem, sleep_time):
