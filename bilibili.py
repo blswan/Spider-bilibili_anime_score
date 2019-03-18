@@ -17,7 +17,7 @@ port= 3306
 database='spiders'
 start_page = 1
 max_page = 155
-threads = 5
+threads = 2
 sleep_time = 1
 
 def get_index(index_response, db):
@@ -43,7 +43,8 @@ def get_index(index_response, db):
 		video_urls[anime_name] = anime_url
 	return video_urls
 
-def get_detail(detail_response, anime_name, db, sleep_time):
+
+def get_detail(detail_response, anime_name, db):
 	"""
 	:detail_response 动漫播放页面的源码
 	:anime_name 动漫名称
@@ -59,6 +60,7 @@ def get_detail(detail_response, anime_name, db, sleep_time):
 		'score': score
 	}
 	update_to_mysql(detail_data, db)
+
 
 def update_to_mysql(data, db):
 	data_keys = ', '.join(data.keys())
@@ -80,7 +82,8 @@ def open_url(url, located_type, located_element, browser):
 		None
 	return browser.page_source
 
-def run(index_url, sem, page, sleep_time):
+
+def run(index_url, sem, page):
 	db = pymysql.connect(host=host, user=user, password=password, port=port, db=database)
 	service_args = []
 	service_args.append('--load-images=no')
@@ -96,18 +99,16 @@ def run(index_url, sem, page, sleep_time):
 	print('==========================\n')
 	time.sleep(sleep_time)
 	db.close()
-	browser.quit()
+	browser.close()
 	sem.release()
 
-def thread(sem, sleep_time):
+def thread(sem):
 	for page in range(start_page, max_page+1):
 		index_url = base_url + str(page)
 		sem.acquire()
-		t = threading.Thread(target=run, args=(index_url,sem, page, sleep_time))
+		t = threading.Thread(target=run, args=(index_url,sem, page))
 		t.start()
-
-
 
 if __name__ == '__main__':
 	sem = threading.Semaphore(threads)
-	thread(sem, sleep_time)
+	thread(sem)
